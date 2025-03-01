@@ -14,17 +14,22 @@ app.use(cors());
 app.get("/", (req, res) => res.send("WebSocket Server is Running!"));
 
 io.on("connection", (socket) => {
-    console.log("✅ A user connected:", socket.id);
-  
-    socket.on("message", (msg) => {
-      console.log("📥 Received on server:", msg); // ✅ Debugging: Is the server receiving messages?
-      io.emit("message", msg); // ✅ Broadcast to all clients
-    });
-  
-    socket.on("disconnect", () => {
-      console.log("❌ User disconnected:", socket.id);
-    });
+  console.log("✅ A user connected:", socket.id);
+
+  socket.on("message", (msg) => {
+    console.log("📥 Received on server:", msg); // ✅ Debugging: Is the server receiving messages?
+    io.emit("message", msg); // ✅ Broadcast to all clients
   });
+
+  socket.on("typing", (username) => {
+    console.log(`⌨️ ${username} is typing...`); // ✅ Debugging: Is typing event working?
+    socket.broadcast.emit("typing", username); // 🔹 Send typing event to all other clients
+  });
+
+  socket.on("disconnect", () => {
+    console.log("❌ User disconnected:", socket.id);
+  });
+});
 
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => console.log(`WebSocket Server running on port ${PORT}`));
